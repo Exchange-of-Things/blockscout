@@ -8,7 +8,6 @@ defmodule BlockScoutWeb.Notifier do
   alias BlockScoutWeb.{
     AddressContractVerificationViaFlattenedCodeView,
     AddressContractVerificationViaJsonView,
-    AddressContractVerificationViaStandardJsonInputView,
     AddressContractVerificationVyperView,
     Endpoint
   }
@@ -48,7 +47,9 @@ defmodule BlockScoutWeb.Notifier do
   def handle_event(
         {:chain_event, :contract_verification_result, :on_demand, {address_hash, contract_verification_result, conn}}
       ) do
-    %{view: view, compiler: compiler} = select_contract_type_and_form_view(conn.params)
+    verification_from_json_upload? = Map.has_key?(conn.params, "file")
+    verification_from_flattened_source? = Map.has_key?(conn.params, "external_libraries")
+    compiler = if verification_from_flattened_source?, do: :solc, else: :vyper
 
     contract_verification_result =
       case contract_verification_result do
@@ -56,7 +57,21 @@ defmodule BlockScoutWeb.Notifier do
           result
 
         {:error, changeset} ->
-          compiler_versions = fetch_compiler_version(compiler)
+          compiler_versions =
+            case CompilerVersion.fetch_versions(compiler) do
+              {:ok, compiler_versions} ->
+                compiler_versions
+
+              {:error, _} ->
+                []
+            end
+
+          view =
+            cond do
+              verification_from_json_upload? -> AddressContractVerificationViaJsonView
+              verification_from_flattened_source? -> AddressContractVerificationViaFlattenedCodeView
+              true -> AddressContractVerificationVyperView
+            end
 
           result =
             view
@@ -185,35 +200,6 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   def handle_event(_), do: nil
-
-  def fetch_compiler_version(compiler) do
-    case CompilerVersion.fetch_versions(compiler) do
-      {:ok, compiler_versions} ->
-        compiler_versions
-
-      {:error, _} ->
-        []
-    end
-  end
-
-  def select_contract_type_and_form_view(params) do
-    verification_from_json_upload? = Map.has_key?(params, "file")
-    verification_from_flattened_source? = Map.has_key?(params, "external_libraries")
-
-    verification_from_standard_json_input? = verification_from_json_upload? && Map.has_key?(params, "smart_contract")
-
-    compiler = if verification_from_flattened_source? || verification_from_standard_json_input?, do: :solc, else: :vyper
-
-    view =
-      cond do
-        verification_from_standard_json_input? -> AddressContractVerificationViaStandardJsonInputView
-        verification_from_json_upload? -> AddressContractVerificationViaJsonView
-        verification_from_flattened_source? -> AddressContractVerificationViaFlattenedCodeView
-        true -> AddressContractVerificationVyperView
-      end
-
-    %{view: view, compiler: compiler}
-  end
 
   @doc """
   Broadcast the percentage of blocks indexed so far.

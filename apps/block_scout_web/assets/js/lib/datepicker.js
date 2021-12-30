@@ -66,9 +66,9 @@ function onSelect (date, paramToReplace) {
   const formattedDate = moment(date).format(DATE_FORMAT)
 
   if (date) {
-    const csvExportPath = $button.data('link')
+    var csvExportPath = $button.data('link')
 
-    const updatedCsvExportUrl = replaceUrlParam(csvExportPath, paramToReplace, formattedDate)
+    var updatedCsvExportUrl = replaceUrlParam(csvExportPath, paramToReplace, formattedDate)
     $button.data('link', updatedCsvExportUrl)
   }
 }
@@ -77,7 +77,7 @@ function replaceUrlParam (url, paramName, paramValue) {
   if (paramValue == null) {
     paramValue = ''
   }
-  const pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)')
+  var pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)')
   if (url.search(pattern) >= 0) {
     return url.replace(pattern, '$1' + paramValue + '$2')
   }

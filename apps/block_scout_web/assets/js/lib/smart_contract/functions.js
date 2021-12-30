@@ -1,7 +1,6 @@
 import $ from 'jquery'
-import { connectSelector, disconnectSelector, getContractABI, getMethodInputs, prepareMethodArgs } from './common_helpers'
-import { queryMethod, callMethod } from './interact'
-import { walletEnabled, connectToWallet, disconnectWallet, web3ModalInit } from './connect.js'
+import { getContractABI, getMethodInputs, prepareMethodArgs } from './common_helpers'
+import { walletEnabled, connectToWallet, shouldHideConnectButton, callMethod, queryMethod } from './write'
 import '../../pages/address'
 
 const loadFunctions = (element) => {
@@ -17,9 +16,37 @@ const loadFunctions = (element) => {
     response => $element.html(response)
   )
     .done(function () {
-      document.querySelector(connectSelector) && document.querySelector(connectSelector).addEventListener('click', connectToWallet)
-      document.querySelector(disconnectSelector) && document.querySelector(disconnectSelector).addEventListener('click', disconnectWallet)
-      web3ModalInit(connectToWallet)
+      const $connect = $('[connect-metamask]')
+      const $connectTo = $('[connect-to]')
+      const $connectedTo = $('[connected-to]')
+      const $reconnect = $('[re-connect-metamask]')
+
+      window.ethereum && window.ethereum.on('accountsChanged', function (accounts) {
+        if (accounts.length === 0) {
+          showConnectElements($connect, $connectTo, $connectedTo)
+        } else {
+          showConnectedToElements($connect, $connectTo, $connectedTo, accounts[0])
+        }
+      })
+
+      shouldHideConnectButton()
+        .then(({ shouldHide, account }) => {
+          if (shouldHide && account) {
+            showConnectedToElements($connect, $connectTo, $connectedTo, account)
+          } else if (shouldHide) {
+            hideConnectButton($connect, $connectTo, $connectedTo)
+          } else {
+            showConnectElements($connect, $connectTo, $connectedTo)
+          }
+        })
+
+      $connect.on('click', () => {
+        connectToWallet()
+      })
+
+      $reconnect.on('click', () => {
+        connectToWallet()
+      })
 
       $('[data-function]').each((_, element) => {
         readWriteFunction(element)
@@ -46,6 +73,30 @@ const loadFunctions = (element) => {
     .fail(function (response) {
       $element.html(response.statusText)
     })
+}
+
+function showConnectedToElements ($connect, $connectTo, $connectedTo, account) {
+  $connectTo.addClass('hidden')
+  $connect.removeClass('hidden')
+  $connectedTo.removeClass('hidden')
+  setConnectToAddress(account)
+}
+
+function setConnectToAddress (account) {
+  const $connectedToAddress = $('[connected-to-address]')
+  $connectedToAddress.html(`<a href='/address/${account}'>${account}</a>`)
+}
+
+function showConnectElements ($connect, $connectTo, $connectedTo) {
+  $connectTo.removeClass('hidden')
+  $connect.removeClass('hidden')
+  $connectedTo.addClass('hidden')
+}
+
+function hideConnectButton ($connect, $connectTo, $connectedTo) {
+  $connectTo.removeClass('hidden')
+  $connect.addClass('hidden')
+  $connectedTo.addClass('hidden')
 }
 
 const readWriteFunction = (element) => {

@@ -9,39 +9,40 @@ defmodule BlockScoutWeb.LayoutView do
 
   @issue_url "https://github.com/blockscout/blockscout/issues/new"
   @default_other_networks [
-    %{
-      title: "POA",
-      url: "https://blockscout.com/poa/core"
-    },
-    %{
-      title: "Sokol",
-      url: "https://blockscout.com/poa/sokol",
-      test_net?: true
-    },
-    %{
-      title: "Gnosis Chain",
-      url: "https://blockscout.com/xdai/mainnet"
-    },
-    %{
-      title: "Ethereum Classic",
-      url: "https://blockscout.com/etc/mainnet",
-      other?: true
-    },
-    %{
-      title: "RSK",
-      url: "https://blockscout.com/rsk/mainnet",
-      other?: true
-    }
+    # %{
+    #   title: "POA",
+    #   url: "https://blockscout.com/poa/core"
+    # },
+    # %{
+    #   title: "Sokol",
+    #   url: "https://blockscout.com/poa/sokol",
+    #   test_net?: true
+    # },
+    # %{
+    #   title: "xDai",
+    #   url: "https://blockscout.com/xdai/mainnet"
+    # },
+    # %{
+    #   title: "Ethereum Classic",
+    #   url: "https://blockscout.com/etc/mainnet",
+    #   other?: true
+    # },
+    # %{
+    #   title: "RSK",
+    #   url: "https://blockscout.com/rsk/mainnet",
+    #   other?: true
+    # }
   ]
 
   alias BlockScoutWeb.SocialMedia
 
   def logo do
-    Keyword.get(application_config(), :logo)
+    Keyword.get(application_config(), :logo) || "/images/xixo.png"
   end
 
   def logo_footer do
-    Keyword.get(application_config(), :logo_footer) || Keyword.get(application_config(), :logo)
+    Keyword.get(application_config(), :logo_footer) || Keyword.get(application_config(), :logo) ||
+      "/images/logo-light.png"
   end
 
   def logo_text do
@@ -66,7 +67,7 @@ defmodule BlockScoutWeb.LayoutView do
 
   def issue_link(conn) do
     params = [
-      labels: "BlockScout",
+      labels: "XToken",
       body: issue_body(conn),
       title: subnetwork_title() <> ": <Issue Title>"
     ]

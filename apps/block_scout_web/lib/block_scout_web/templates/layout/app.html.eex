@@ -42,7 +42,7 @@
         'Less than': '<%= gettext("Less than") %>',
         'Market Cap': '<%= gettext("Market Cap") %>',
         'Price': '<%= gettext("Price") %>',
-        'Ether': '<%= gettext("Ether") %>',
+        'Ether': '<%= gettext("XOT") %>',
         'Tx/day': '<%= gettext("Tx/day") %>'
       }
     </script>
@@ -231,8 +231,7 @@
       @view_module != Elixir.BlockScoutWeb.Tokens.Instance.TransferView &&
       @view_module != Elixir.BlockScoutWeb.APIDocsView &&
       @view_module != Elixir.BlockScoutWeb.Admin.DashboardView &&
-      @view_module != Elixir.BlockScoutWeb.SearchView &&
-      @view_module != Elixir.BlockScoutWeb.AddressContractVerificationViaStandardJsonInputView
+      @view_module != Elixir.BlockScoutWeb.SearchView
     ) do %>
       <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/app.js") %>"></script>
     <% end %>

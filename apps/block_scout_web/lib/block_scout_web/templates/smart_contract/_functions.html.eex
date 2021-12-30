@@ -1,7 +1,6 @@
 <% minimal_proxy_template = Chain.get_minimal_proxy_template(@address.hash) %>
 <% metadata_for_verification = minimal_proxy_template || Chain.get_address_verified_twin_contract(@address.hash).verified_contract %>
-<% smart_contract_verified = BlockScoutWeb.AddressView.smart_contract_verified?(@address) %>
-<%= unless smart_contract_verified do %>
+<%= unless BlockScoutWeb.AddressView.smart_contract_verified?(@address) do %>
   <%= if metadata_for_verification do %>
     <%= if minimal_proxy_template do %>
       <%= render BlockScoutWeb.CommonComponentsView, "_minimal_proxy_pattern.html", address_hash: metadata_for_verification.address_hash, conn: @conn %>
@@ -17,9 +16,6 @@
       </div>
     <% end %>
   <% end %>
-<% end %>
-<%= if smart_contract_verified && @address.smart_contract.is_changed_bytecode do %>
-  <%= render BlockScoutWeb.CommonComponentsView, "_changed_bytecode_warning.html" %>
 <% end %>
 <%= if @action == "write" or (@read_functions_required_wallet && @read_functions_required_wallet != []) do %>
   <%= render BlockScoutWeb.SmartContractView, "_connect_container.html" %>
@@ -61,13 +57,13 @@
 
           <%= if queryable?(function["inputs"]) do %>
             <%= for input <- function["inputs"] do %>
-              <div class="form-group pr-3 d-flex" style="margin: 0.5rem 0 !important;">
+              <div class="form-group pr-3">
                 <%= if int?(input["type"]) do %>
-                  <input type="number" name="function_input" class="form-control form-control-sm address-input-sm"
+                  <input type="number" name="function_input" class="form-control form-control-sm address-input-sm mt-2"
                   placeholder='<%= input["name"] %>(<%= input["type"] %>)'
                   style="width: <%= (String.length(input["name"]) + String.length(input["type"]) + 2) * 10 %>px;"/>
                   <span data-dropdown-toggle="" data-toggle="dropdown">
-                    <span class="button btn-line button-xs contract-plus-btn-container ml-1">
+                    <span class="button btn-line button-xs contract-plus-btn-container ml-1 mt-2">
                       <i class="fa fa-plus contract-plus-btn"></i>
                     </span>
                     <div class="dropdown-menu exponention-dropdown">  
@@ -79,7 +75,7 @@
                   </span>
 
                 <% else %>
-                  <input type="text" name="function_input" class="form-control form-control-sm address-input-sm" 
+                  <input type="text" name="function_input" class="form-control form-control-sm address-input-sm mt-2" 
                   placeholder='<%= input["name"] %>(<%= input["type"] %>)' 
                   size="<%= String.length(input["name"]) + String.length(input["type"]) + 2 %>" />
                 <% end %>
@@ -88,15 +84,13 @@
           <% end %>
 
           <%= if Helper.payable?(function) do %>
-            <div class="form-group pr-3 d-flex">
+            <div class="form-group pr-3">
               <input type="number" name="function_input" tx-value
-              data-toggle="tooltip" title='Amount in native token <<%= gettext("ETH")%>>' class="form-control form-control-sm address-input-sm" placeholder='value(<%= gettext("ETH")%>)' min="0" step="1e-18" />
+              data-toggle="tooltip" title='Amount in native token <<%= gettext("ETH")%>>' class="form-control form-control-sm address-input-sm mt-2" placeholder='value(<%= gettext("ETH")%>)' min="0" step="1e-18" />
             </div>
           <% end %>
 
-          <div>
-            <input type="submit" value='<%= if @action == "write", do: gettext("Write"), else: gettext("Query")%>' class="button btn-line button-xs py-0 write-contract-btn" />
-          </div>
+          <input type="submit" value='<%= if @action == "write", do: gettext("Write"), else: gettext("Query")%>' class="button btn-line button-xs py-0 mt-2 write-contract-btn" />
         </form>
 
         <%= if outputs?(function["outputs"]) do %>

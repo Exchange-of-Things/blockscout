@@ -57,27 +57,6 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
     send_resp(conn, 204, "")
   end
 
-  # sobelow_skip ["Traversal.FileModule"]
-  def create(
-        conn,
-        %{
-          "smart_contract" => smart_contract,
-          "file" => files
-        }
-      ) do
-    files_array = prepare_files_array(files)
-
-    with %Plug.Upload{path: path} <- get_one_json(files_array),
-         {:ok, json_input} <- File.read(path) do
-      Que.add(SolidityPublisherWorker, {smart_contract, json_input, conn})
-    else
-      _ ->
-        nil
-    end
-
-    send_resp(conn, 204, "")
-  end
-
   def create(
         conn,
         %{
@@ -98,7 +77,11 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
       ) do
     files_array = prepare_files_array(files)
 
-    json_file = get_one_json(files_array)
+    json_files =
+      files_array
+      |> Enum.filter(fn file -> file.content_type == "application/json" end)
+
+    json_file = json_files |> Enum.at(0)
 
     if json_file do
       if Chain.smart_contract_fully_verified?(address_hash_string) do
@@ -203,12 +186,6 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
 
   def prepare_files_array(files) do
     if is_map(files), do: Enum.map(files, fn {_, file} -> file end), else: []
-  end
-
-  defp get_one_json(files_array) do
-    files_array
-    |> Enum.filter(fn file -> file.content_type == "application/json" end)
-    |> Enum.at(0)
   end
 
   defp prepare_verification_error(msg, address_hash_string, conn) do

@@ -1,0 +1,10 @@
+[parity]
+mode = "active"
+release_track = "stable"
+base_path = "/opt/.local/share/io.parity.ethereum"
+
+[network]
+warp = false
+
+[misc]
+log_file = "/home/thuannd/code/blockscout/storage/config/xixo.log"

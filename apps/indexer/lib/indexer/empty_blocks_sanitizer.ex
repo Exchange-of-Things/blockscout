@@ -1,7 +1,7 @@
 defmodule Indexer.EmptyBlocksSanitizer do
   @moduledoc """
   Periodically checks empty blocks starting from the head of the chain, detects for which blocks transactions should be refetched
-  and lose consensus for block in order to refetch transactions.
+  and loose consensus for block in order to refetch transactions.
   """
 
   use GenServer

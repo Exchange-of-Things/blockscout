@@ -84,6 +84,7 @@ const appJs =
       'admin-tasks': './js/pages/admin/tasks.js',
       'read-token-contract': './js/pages/read_token_contract.js',
       'smart-contract-helpers': './js/lib/smart_contract/index.js',
+      'write-contract': './js/pages/write_contract.js',
       'token-transfers-toggle': './js/lib/token_transfers_toggle.js',
       'try-api': './js/lib/try_api.js',
       'try-eth-api': './js/lib/try_eth_api.js',
@@ -174,9 +175,7 @@ const appJs =
       ),
       new ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
       new webpack.DefinePlugin({
-        'process.env.SOCKET_ROOT': JSON.stringify(process.env.SOCKET_ROOT),
-        'process.env.CHAIN_ID': JSON.stringify(process.env.CHAIN_ID),
-        'process.env.JSON_RPC': JSON.stringify(process.env.JSON_RPC)
+        'process.env.SOCKET_ROOT': JSON.stringify(process.env.SOCKET_ROOT)
       }),
       new webpack.ProvidePlugin({
         process: 'process/browser',

@@ -14,7 +14,6 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
   """
 
   require Logger
-  require APILogger
 
   import Plug.Conn
   import Phoenix.Controller, only: [put_view: 2]
@@ -26,12 +25,10 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
   def init(opts), do: opts
 
   def call(%Conn{params: %{"module" => module, "action" => action}} = conn, translations) do
-    with true <- valid_api_request_path(conn),
-         {:ok, {controller, write_actions}} <- translate_module(translations, module),
+    with {:ok, {controller, write_actions}} <- translate_module(translations, module),
          {:ok, action} <- translate_action(action),
          true <- action_accessed?(action, write_actions),
          {:ok, conn} <- call_controller(conn, controller, action) do
-      APILogger.log(conn)
       conn
     else
       {:error, :no_action} ->
@@ -108,13 +105,5 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
   rescue
     e ->
       {:error, Exception.format(:error, e, __STACKTRACE__)}
-  end
-
-  defp valid_api_request_path(conn) do
-    if conn.request_path == "/api" || conn.request_path == "/api/v1" do
-      true
-    else
-      false
-    end
   end
 end

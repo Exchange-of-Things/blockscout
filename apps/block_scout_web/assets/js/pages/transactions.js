@@ -58,7 +58,7 @@ export function reducer (state = initialState, action) {
 const elements = {
   '[data-selector="channel-disconnected-message"]': {
     render ($el, state) {
-      if (state.channelDisconnected && !window.loading) $el.show()
+      if (state.channelDisconnected) $el.show()
     }
   },
   '[data-selector="channel-batching-count"]': {
@@ -82,10 +82,6 @@ const elements = {
 
 const $transactionListPage = $('[data-page="transaction-list"]')
 if ($transactionListPage.length) {
-  window.onbeforeunload = () => {
-    window.loading = true
-  }
-
   const store = createAsyncLoadStore(reducer, initialState, 'dataset.identifierHash')
 
   connectElements({ store, elements })

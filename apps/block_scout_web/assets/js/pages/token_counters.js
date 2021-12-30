@@ -95,14 +95,10 @@ function updateCounters () {
 }
 
 if ($('[data-page="token-holders-list"]').length) {
-  window.onbeforeunload = () => {
-    window.loading = true
-  }
-
   const asyncElements = {
     '[data-selector="channel-disconnected-message"]': {
       render ($el, state) {
-        if (state.channelDisconnected && !window.loading) $el.show()
+        if (state.channelDisconnected) $el.show()
       }
     }
   }

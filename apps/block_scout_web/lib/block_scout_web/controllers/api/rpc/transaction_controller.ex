@@ -13,8 +13,7 @@ defmodule BlockScoutWeb.API.RPC.TransactionController do
          {:transaction, {:ok, %Transaction{revert_reason: revert_reason, error: error} = transaction}} <-
            transaction_from_hash(transaction_hash),
          paging_options <- paging_options(params) do
-      from_api = true
-      logs = Chain.transaction_to_logs(transaction_hash, from_api, paging_options)
+      logs = Chain.transaction_to_logs(transaction_hash, paging_options)
       {logs, next_page} = split_list_by_page(logs)
 
       transaction_updated =

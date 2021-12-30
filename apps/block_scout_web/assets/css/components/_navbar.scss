@@ -256,10 +256,6 @@ $navbar-logo-width: auto !default;
   &.in-footer {
     color: #fff;
   }
-
-  &.no-logo {
-    margin-left: 0px;
-  }
 }
 
 @include media-breakpoint-up(md) {
@@ -283,7 +279,7 @@ $navbar-logo-width: auto !default;
 }
 
 .navbar-container, .navbar-primary {
-  @media (min-width: 992px) {
+  @include media-breakpoint-up(xl) {
     padding-right: 0;
   }
 }

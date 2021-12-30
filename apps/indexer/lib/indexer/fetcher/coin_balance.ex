@@ -79,7 +79,7 @@ defmodule Indexer.Fetcher.CoinBalance do
 
     unique_filtered_entries =
       Enum.filter(unique_entries, fn {_hash, block_number} ->
-        block_number >= EthereumJSONRPC.first_block_to_fetch(:trace_first_block)
+        block_number >= first_block_to_index()
       end)
 
     unique_entry_count = Enum.count(unique_filtered_entries)
@@ -103,6 +103,15 @@ defmodule Indexer.Fetcher.CoinBalance do
         )
 
         {:retry, unique_filtered_entries}
+    end
+  end
+
+  defp first_block_to_index do
+    string_value = Application.get_env(:indexer, :first_block)
+
+    case Integer.parse(string_value) do
+      {integer, ""} -> integer
+      _ -> 0
     end
   end
 

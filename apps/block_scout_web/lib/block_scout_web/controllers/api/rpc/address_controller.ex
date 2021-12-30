@@ -4,7 +4,6 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
   alias BlockScoutWeb.API.RPC.Helpers
   alias Explorer.{Chain, Etherscan}
   alias Explorer.Chain.{Address, Wei}
-  alias Explorer.Etherscan.{Addresses, Blocks}
   alias Indexer.Fetcher.CoinBalanceOnDemand
 
   def listaccounts(conn, params) do
@@ -25,7 +24,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
     with {:address_param, {:ok, address_param}} <- fetch_address(params),
          {:block_param, {:ok, block}} <- {:block_param, fetch_block_param(params)},
          {:format, {:ok, address_hash}} <- to_address_hash(address_param),
-         {:balance, {:ok, balance}} <- {:balance, Blocks.get_balance_as_of_block(address_hash, block)} do
+         {:balance, {:ok, balance}} <- {:balance, Chain.get_balance_as_of_block(address_hash, block)} do
       render(conn, :eth_get_balance, %{balance: Wei.hex_format(balance)})
     else
       {:address_param, :error} ->
@@ -348,7 +347,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
 
     # limit is just page_size
     offset
-    |> Addresses.list_ordered_addresses(page_size)
+    |> Chain.list_ordered_addresses(page_size)
     |> trigger_balances_and_add_status()
   end
 
